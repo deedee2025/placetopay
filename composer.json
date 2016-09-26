@@ -1,6 +1,7 @@
 {
     "name": "deedee2025/placetoplay",
     "description": "PHP Wrapper for PlaceToPay integration.",
+    "keywords": ["placetopay","pse"],
     "authors": [
         {
             "name": "Sebas Fernandez",
@@ -10,6 +11,6 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "php": ">=5.6.4"
+        "php": "^5.3.3 || ^7.0"
     }
 }
