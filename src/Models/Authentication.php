@@ -2,18 +2,16 @@
 
 namespace deedee2025\PlaceToPay\Models;
 
-class Auth {
+class Authentication {
 	private $login;
 	private $tranKey;
 	private $seed;
 	private $additional;
-	private $hash;
 
 	public function __construct( $login, $tranKey, $additional = null ) {
 		$this->login      = $login;
-		$this->tranKey    = $tranKey;
-		$this->additional = $additional;
 		$this->seed       = date( 'c' );
-		$this->hash       = sha1( $this->seed . $this->tranKey, false );
+		$this->tranKey    = sha1( $this->seed . $tranKey, false );
+		$this->additional = $additional;
 	}
 }
