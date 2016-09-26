@@ -22,7 +22,7 @@ class PlaceToPay {
 		return $response->getBankListResult->item;
 	}
 
-	public static function createTransaction( PSETransactionRequest $request, $saveOnSession = false, $sessionVar = 'transactionIds' ) {
+	public static function createTransaction( PSETransactionRequest $request, $saveOnSession = false, $sessionVar = 'PSEtransactions' ) {
 		$client   = new SoapClient( self::$wsdl );
 		$response = $client->__soapCall( 'createTransaction', array(
 			[
@@ -35,7 +35,10 @@ class PlaceToPay {
 				session_start();
 			}
 			$transactionIds          = empty( $_SESSION[ $sessionVar ] ) ? [] : $_SESSION[ $sessionVar ];
-			$transactionIds[]        = $response->createTransactionResult->transactionID;
+			$transObj                = new \stdClass();
+			$transObj->transactionID = $response->createTransactionResult->transactionID;
+			$transObj->returnCode    = $response->createTransactionResult->returnCode;
+			$transactionIds[]        = $transObj;
 			$_SESSION[ $sessionVar ] = $transactionIds;
 		}
 
@@ -54,18 +57,16 @@ class PlaceToPay {
 		return $response->getTransactionInformationResult;
 	}
 
-	public static function getStoredTransactionsInfo() {
+	public static function getStoredTransactionsInfo( $sessionVar = 'PSEtransactions' ) {
 		if ( ! self::isSessionStarted() ) {
 			session_start();
 		}
 
 		$result = [];
-		if ( ! empty( $_SESSION['transactionIds'] ) ) {
-			foreach ( $_SESSION['transactionIds'] as $transId ) {
-				if ( ! array_key_exists( $transId, $result ) ) {
-					$response           = PlaceToPay::getTransactionInformation( $transId );
-					$result[ $transId ] = $response;
-				}
+		if ( ! empty( $_SESSION[ $sessionVar ] ) ) {
+			foreach ( $_SESSION[ $sessionVar ] as $transId ) {
+				$response                          = PlaceToPay::getTransactionInformation( $transId->transactionID );
+				$result[ $transId->transactionID ] = $response;
 			}
 		}
 
