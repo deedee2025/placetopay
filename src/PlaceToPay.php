@@ -31,9 +31,11 @@ class PlaceToPay {
 			]
 		) );
 		if ( $saveOnSession ) {
-			session_start();
+			if ( ! self::isSessionStarted() ) {
+				session_start();
+			}
 			$transactionIds          = empty( $_SESSION[ $sessionVar ] ) ? [] : $_SESSION[ $sessionVar ];
-			$transactionIds[] = $response->createTransactionResult->transactionID;
+			$transactionIds[]        = $response->createTransactionResult->transactionID;
 			$_SESSION[ $sessionVar ] = $transactionIds;
 		}
 
@@ -52,8 +54,38 @@ class PlaceToPay {
 		return $response->getTransactionInformationResult;
 	}
 
+	public static function getStoredTransactionsInfo() {
+		if ( ! self::isSessionStarted() ) {
+			session_start();
+		}
+
+		$result = [];
+		if ( ! empty( $_SESSION['transactionIds'] ) ) {
+			foreach ( $_SESSION['transactionIds'] as $transId ) {
+				if ( ! array_key_exists( $transId, $result ) ) {
+					$response           = PlaceToPay::getTransactionInformation( $transId );
+					$result[ $transId ] = $response;
+				}
+			}
+		}
+
+		return $result;
+	}
+
 	public static function printRequestForm( $url ) {
 		$banks = self::getBankList();
 		Forms::PSETansactionRequestForm( $banks, $url );
+	}
+
+	protected static function isSessionStarted() {
+		if ( php_sapi_name() !== 'cli' ) {
+			if ( version_compare( phpversion(), '5.4.0', '>=' ) ) {
+				return session_status() === PHP_SESSION_ACTIVE ? true : false;
+			} else {
+				return session_id() === '' ? false : true;
+			}
+		}
+
+		return false;
 	}
 }
