@@ -1,0 +1,19 @@
+{
+    "name": "deedee2025/placetoplay-wrapper",
+    "description": "PHP Wrapper for PlaceToPay integration.",
+    "authors": [
+        {
+            "name": "Sebas Fernandez",
+            "email": "deedee2025@outlook.com"
+        }
+    ],
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-0": {
+            "PlaceToPay": "src/"
+        }
+    }
+}
